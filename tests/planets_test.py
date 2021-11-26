@@ -23,3 +23,15 @@ def test_utc_check():
                 """Azimuth: 247deg 58' 33.6", Altitude: 09deg 22' 10.7", Name: SATURN BARYCENTER""",
                 ]
     assert planets == response
+
+
+def test_local_check():
+    """Function to check the local logic"""
+
+    planets = list(Planets().get_planets_at_local(2021, 11, 25, 21, 46, 0))
+    response = ["""Azimuth: 246deg 06' 11.5", Altitude: -12deg 13' 13.0", Name: venus""",
+                """Azimuth: 255deg 34' 03.6", Altitude: -71deg 20' 06.4", Name: mars""",
+                """Azimuth: 247deg 01' 49.7", Altitude: 25deg 29' 11.6", Name: JUPITER BARYCENTER""",
+                """Azimuth: 247deg 58' 33.6", Altitude: 09deg 22' 10.7", Name: SATURN BARYCENTER""",
+                ]
+    assert planets == response

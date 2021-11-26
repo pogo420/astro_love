@@ -1,4 +1,12 @@
+from enum import Enum
+
 from skyfield.api import load, Topos
+import datetime
+
+
+class TZ(Enum):
+    IST = "IST"
+    UTC = "UTC"
 
 
 class Planet:
@@ -39,8 +47,16 @@ class Planets:
         """Generating current location"""
         return source + Topos(self.__longitude, self.__latitude)
 
-    def __generate_timestamp(self, year, month, day, hour, minute, second):
-        return self.__ts.utc(year, month, day, hour, minute, second)
+    def __generate_timestamp(self, year, month, day, hour, minute, second, tz: TZ):
+        if tz == TZ.UTC:
+            return self.__ts.utc(year, month, day, hour, minute, second)
+        elif tz == TZ.IST:
+            datetime__ = datetime.datetime(year, month, day, hour, minute, second)
+            datetime__ = datetime__ - datetime.timedelta(hours=5, minutes=30)  # converting to utc time
+
+            year, month, day, hour, minute, second = datetime__.year, datetime__.month, datetime__.day, datetime__.hour, \
+                                                     datetime__.minute, datetime__.second
+            return self.__ts.utc(year, month, day, hour, minute, second)
 
     def __generate_planet_list(self, datetime=None):
         """method implementing planet list logic"""
@@ -59,10 +75,14 @@ class Planets:
 
     def get_planets_at_utc(self, year, month, day, hour, minute, second):
         """Method to get planet locations as per utc time"""
-        datetime = self.__generate_timestamp(year, month, day, hour, minute, second)
+        datetime = self.__generate_timestamp(year, month, day, hour, minute, second, TZ.UTC)
         return self.__generate_planet_list(datetime)
+
+    def get_planets_at_local(self, year, month, day, hour, minute, second):
+        """Method to get planet locations as per local time"""
+        datetime_ = self.__generate_timestamp(year, month, day, hour, minute, second, TZ.IST)
+        return self.__generate_planet_list(datetime_)
 
     def get_current_planets(self):
         """Method to get current planet locations"""
         return self.__generate_planet_list()
-
